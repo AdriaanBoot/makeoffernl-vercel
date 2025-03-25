@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ReCAPTCHA from "react-google-recaptcha"; // Gebruik react-google-recaptcha voor Google reCAPTCHA
+import ReCAPTCHA from "react-google-recaptcha";
 import fs from "fs";
 import path from "path";
 
@@ -19,16 +19,19 @@ export default function DomainPage({ domain }) {
   };
 
   const handleCaptchaChange = (value) => {
-    setCaptchaValue(value); // Sla de captcha waarde op
+    setCaptchaValue(value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Controleer of captcha is ingevuld
     if (!captchaValue) {
       alert("Bevestig dat je geen robot bent.");
       return;
     }
 
+    // Verstuur formuliergegevens naar de API
     const response = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,6 +45,11 @@ export default function DomainPage({ domain }) {
       alert("Er is iets misgegaan. Probeer opnieuw.");
     }
   };
+
+  // Als het domein niet gevonden is, toon een foutmelding
+  if (!domain) {
+    return <p>Domein niet gevonden.</p>;
+  }
 
   return (
     <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
@@ -86,9 +94,8 @@ export default function DomainPage({ domain }) {
           onChange={handleChange}
         ></textarea>
 
-        {/* Google reCAPTCHA widget */}
         <ReCAPTCHA
-          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY} // Gebruik je Google reCAPTCHA sitekey
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY} // Zorg ervoor dat de sitekey goed is ingesteld
           onChange={handleCaptchaChange}
         />
 
@@ -98,18 +105,20 @@ export default function DomainPage({ domain }) {
   );
 }
 
+// Haal de paden op voor de dynamische pagina's tijdens build
 export async function getStaticPaths() {
   const filePath = path.join(process.cwd(), "data", "domeinen.json");
   const jsonData = fs.readFileSync(filePath, "utf8");
   const allDomains = JSON.parse(jsonData);
 
   const paths = allDomains.map((domain) => ({
-    params: { domain: domain.toLowerCase() },
+    params: { domain: domain.toLowerCase() }, // Zorg ervoor dat de domeinnamen in kleine letters zijn
   }));
 
   return { paths, fallback: false };
 }
 
+// Haal de gegevens voor een specifiek domein op
 export async function getStaticProps({ params }) {
   const { domain } = params;
 
@@ -121,7 +130,10 @@ export async function getStaticProps({ params }) {
   const jsonData = fs.readFileSync(filePath, "utf8");
   const allDomains = JSON.parse(jsonData);
 
-  const originalDomain = allDomains.find((d) => d.toLowerCase() === domain.toLowerCase());
+  // Zoek naar het domein met de originele naam (hoofdletters behouden)
+  const originalDomain = allDomains.find(
+    (d) => d.toLowerCase() === domain.toLowerCase()
+  );
 
   if (!originalDomain) {
     return { notFound: true };
