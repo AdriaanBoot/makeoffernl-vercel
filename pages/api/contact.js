@@ -2,29 +2,29 @@ import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { name, email, phone, offer, message, captcha } = req.body;
+    const { name, email, phone, offer, message, captcha, domain } = req.body;
 
     // Controleer of de captcha aanwezig is
     if (!captcha) {
       return res.status(400).json({ message: "Captcha ontbreekt" });
     }
 
-    // Verifieer de captcha met de hCaptcha API
-    const verifyUrl = `https://hcaptcha.com/siteverify`;
-    const secretKey = process.env.HCAPTCHA_SECRET_KEY;
+    // Verifieer de captcha met de Google reCAPTCHA API
+    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY; // Zorg ervoor dat je de juiste secret key gebruikt
     
-    // Verstuur de validatie-aanvraag naar hCaptcha
+    // Verstuur de validatie-aanvraag naar Google reCAPTCHA
     const response = await fetch(verifyUrl, {
       method: "POST",
       body: new URLSearchParams({
         secret: secretKey,
-        response: captcha,  // captcha code vanuit frontend
+        response: captcha,  // De captcha code vanuit de frontend
       }),
     });
 
     const data = await response.json();
 
-    console.log("hCaptcha response:", data); // Debugging van de response
+    console.log("reCAPTCHA response:", data); // Debugging van de response
 
     if (!data.success) {
       return res.status(400).json({ message: "Captcha verificatie mislukt" });
@@ -45,19 +45,19 @@ export default async function handler(req, res) {
     });
 
     // Controleer SMTP-verbinding
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error("SMTP fout:", error);
-  } else {
-    console.log("✅ SMTP verbinding succesvol!");
-  }
-});
+    transporter.verify(function (error, success) {
+      if (error) {
+        console.error("SMTP fout:", error);
+      } else {
+        console.log("✅ SMTP verbinding succesvol!");
+      }
+    });
 
     try {
       await transporter.sendMail({
         from: 'offer@makeoffer.nl',
         to: 'offer@makeoffer.nl',
-        subject: `Nieuw bod voor ${req.body.domain}`,
+        subject: `Nieuw bod voor ${domain}`,
         text: `Naam: ${name}\nEmail: ${email}\nTelefoon: ${phone}\nBod: €${offer}\nBericht: ${message}`,
       });
       return res.status(200).json({ message: "Bod succesvol verzonden!" });
@@ -68,10 +68,4 @@ transporter.verify(function (error, success) {
   } else {
     res.status(405).json({ message: 'Method Not Allowed' });
   }
-}
-
-export async function getServerSideProps(context) {
-  return {
-    props: { domain: context.params.domain || "" },
-  };
 }
