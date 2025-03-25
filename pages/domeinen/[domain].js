@@ -51,9 +51,6 @@ export default function DomainPage({ domain }) {
     return <p>Domein niet gevonden.</p>;
   }
 
-  // Voeg hier de console.log toe om te controleren of de sitekey goed wordt geladen
-  console.log('ReCAPTCHA Sitekey:', process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY);
-  
   return (
     <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
       <h1>Bied op {domain}</h1>
