@@ -9,7 +9,7 @@ export default function DomainsList({ domains }) {
       <ul>
         {domains.map((domain, index) => (
           <li key={index}>
-            <Link href={`/domeinen/${domain.toLowerCase()}`}>
+            <Link href={`/domeinen/${domain.toLowerCase()}`} prefetch={false}>
               {domain}
             </Link>
           </li>
@@ -20,14 +20,16 @@ export default function DomainsList({ domains }) {
 }
 
 export async function getStaticProps() {
-  // Haal de domeinnamen op uit het JSON-bestand
   const filePath = path.join(process.cwd(), "data", "domeinen.json");
-  const jsonData = fs.readFileSync(filePath, "utf8");
+
+  // Gebruik fs.promises.readFile om het bestand asynchroon te lezen
+  const jsonData = await fs.promises.readFile(filePath, "utf8");
   const allDomains = JSON.parse(jsonData);
 
   return {
     props: {
       domains: allDomains, // Geef de lijst van domeinen door als props
     },
+    revalidate: 60, // Revalidate de pagina elke 60 seconden
   };
 }

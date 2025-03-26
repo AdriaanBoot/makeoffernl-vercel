@@ -11,7 +11,7 @@ export default function DomainsPage({ domains }) {
         {domains.map((domain) => (
           <li key={domain.domain} style={{ marginBottom: "15px" }}>
             {/* Correct gebruik van <Link> zonder <a> */}
-            <Link href={`/domains/${domain.domain.toLowerCase()}`}>
+            <Link href={`/domains/${domain.domain.toLowerCase()}`} prefetch={false}>
               {domain.domain}
             </Link>
           </li>
@@ -23,12 +23,15 @@ export default function DomainsPage({ domains }) {
 
 export async function getStaticProps() {
   const filePath = path.join(process.cwd(), "data", "domains_data.json");
-  const jsonData = fs.readFileSync(filePath, "utf8");
+
+  // Gebruik fs.promises.readFile voor asynchrone bestandstoegang
+  const jsonData = await fs.promises.readFile(filePath, "utf8");
   const domains = JSON.parse(jsonData);
 
   return {
     props: {
       domains,
     },
+    revalidate: 60, // Revalidate de pagina elke 60 seconden
   };
 }

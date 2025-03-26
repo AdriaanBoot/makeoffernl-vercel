@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import fs from "fs";
 import path from "path";
+import Link from "next/link";
 
 export default function DomainPage({ domain }) {
   const [formData, setFormData] = useState({
@@ -13,40 +14,47 @@ export default function DomainPage({ domain }) {
   });
 
   const [captchaValue, setCaptchaValue] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = useCallback((e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
 
-  const handleCaptchaChange = (value) => {
+  const handleCaptchaChange = useCallback((value) => {
     setCaptchaValue(value);
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Controleer of captcha is ingevuld
     if (!captchaValue) {
       alert("Bevestig dat je geen robot bent.");
       return;
     }
 
-    // Verstuur formuliergegevens naar de API
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...formData, captcha: captchaValue, domain }),
-    });
+    setLoading(true);
 
-    if (response.ok) {
-      alert("Bod succesvol verzonden!");
-      setFormData({ name: "", email: "", phone: "", offer: "", message: "" });
-    } else {
-      alert("Er is iets misgegaan. Probeer opnieuw.");
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, captcha: captchaValue, domain }),
+      });
+
+      if (response.ok) {
+        alert("Bod succesvol verzonden!");
+        setFormData({ name: "", email: "", phone: "", offer: "", message: "" });
+        setCaptchaValue(null);
+      } else {
+        throw new Error("Er is iets misgegaan. Probeer opnieuw.");
+      }
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Als het domein niet gevonden is, toon een foutmelding
   if (!domain) {
     return <p>Domein niet gevonden.</p>;
   }
@@ -55,70 +63,38 @@ export default function DomainPage({ domain }) {
     <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
       <h1>Bied op {domain}</h1>
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Naam"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Emailadres"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="tel"
-          name="phone"
-          placeholder="Telefoonnummer"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="number"
-          name="offer"
-          placeholder="Bod in euro's"
-          value={formData.offer}
-          onChange={handleChange}
-          required
-        />
-        <textarea
-          name="message"
-          placeholder="Optioneel bericht"
-          value={formData.message}
-          onChange={handleChange}
-        ></textarea>
+        <input type="text" name="name" placeholder="Naam" value={formData.name} onChange={handleChange} required />
+        <input type="email" name="email" placeholder="Emailadres" value={formData.email} onChange={handleChange} required />
+        <input type="tel" name="phone" placeholder="Telefoonnummer" value={formData.phone} onChange={handleChange} required />
+        <input type="number" name="offer" placeholder="Bod in euro's" value={formData.offer} onChange={handleChange} required />
+        <textarea name="message" placeholder="Optioneel bericht" value={formData.message} onChange={handleChange} />
 
-        <ReCAPTCHA
-          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY} // Zorg ervoor dat de sitekey goed is ingesteld
-          onChange={handleCaptchaChange}
-        />
-
-        <button type="submit">Verstuur bod</button>
+        <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY} onChange={handleCaptchaChange} />
+        <button type="submit" disabled={loading}>{loading ? "Verzenden..." : "Verstuur bod"}</button>
       </form>
+
+      <Link href="/" prefetch={false} style={{ display: "block", marginTop: "20px", textAlign: "center" }}>
+        Terug naar home
+      </Link>
     </div>
   );
 }
 
-// Haal de paden op voor de dynamische pagina's tijdens build
+// **Optimaliseer getStaticPaths()**
 export async function getStaticPaths() {
   const filePath = path.join(process.cwd(), "data", "domeinen.json");
   const jsonData = fs.readFileSync(filePath, "utf8");
   const allDomains = JSON.parse(jsonData);
 
-  const paths = allDomains.map((domain) => ({
-    params: { domain: domain.toLowerCase() }, // Zorg ervoor dat de domeinnamen in kleine letters zijn
+  // Beperk het aantal statisch gegenereerde pagina’s om buildtijd te verkorten
+  const paths = allDomains.slice(0, 50).map((domain) => ({
+    params: { domain: domain.toLowerCase() },
   }));
 
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
 }
 
-// Haal de gegevens voor een specifiek domein op
+// **Optimaliseer getStaticProps()**
 export async function getStaticProps({ params }) {
   const { domain } = params;
 
@@ -130,15 +106,14 @@ export async function getStaticProps({ params }) {
   const jsonData = fs.readFileSync(filePath, "utf8");
   const allDomains = JSON.parse(jsonData);
 
-  // Zoek naar het domein met de originele naam (hoofdletters behouden)
-  const originalDomain = allDomains.find(
-    (d) => d.toLowerCase() === domain.toLowerCase()
-  );
+  const originalDomain = allDomains.find((d) => d.toLowerCase() === domain.toLowerCase());
 
   if (!originalDomain) {
     return { notFound: true };
   }
 
-  return { props: { domain: originalDomain } };
+  return {
+    props: { domain: originalDomain },
+    revalidate: 3600, // Pagina wordt max 1x per uur vernieuwd
+  };
 }
-
