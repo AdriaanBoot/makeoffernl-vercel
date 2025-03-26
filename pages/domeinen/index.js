@@ -30,6 +30,6 @@ export async function getStaticProps() {
     props: {
       domains: allDomains, // Geef de lijst van domeinen door als props
     },
-    revalidate: 60, // Revalidate de pagina elke 60 seconden
+    revalidate: 18000, // Revalidate de pagina elke 18000 seconden
   };
 }

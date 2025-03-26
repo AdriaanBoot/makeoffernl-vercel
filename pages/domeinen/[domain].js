@@ -114,6 +114,6 @@ export async function getStaticProps({ params }) {
 
   return {
     props: { domain: originalDomain },
-    revalidate: 3600, // Pagina wordt max 1x per uur vernieuwd
+    revalidate: 18000, // Revalidate de pagina elke 18000 seconden
   };
 }
