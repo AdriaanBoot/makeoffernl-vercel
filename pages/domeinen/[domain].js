@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import Link from "next/link";
 
-export default function DomainPage({ domain }) {
+export default function DomainPage({ domainData }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -38,7 +38,7 @@ export default function DomainPage({ domain }) {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, captcha: captchaValue, domain }),
+        body: JSON.stringify({ ...formData, captcha: captchaValue, domain: domainData.domain }),
       });
 
       if (response.ok) {
@@ -55,65 +55,140 @@ export default function DomainPage({ domain }) {
     }
   };
 
-  if (!domain) {
+  if (!domainData) {
     return <p>Domein niet gevonden.</p>;
   }
 
   return (
-    <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
-      <h1>Bied op {domain}</h1>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <input type="text" name="name" placeholder="Naam" value={formData.name} onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Emailadres" value={formData.email} onChange={handleChange} required />
-        <input type="tel" name="phone" placeholder="Telefoonnummer" value={formData.phone} onChange={handleChange} required />
-        <input type="number" name="offer" placeholder="Bod in euro's" value={formData.offer} onChange={handleChange} required />
-        <textarea name="message" placeholder="Optioneel bericht" value={formData.message} onChange={handleChange} />
+    <div style={{ padding: "20px", maxWidth: "600px", margin: "auto", backgroundColor: "#fff", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
+      <h1 style={{ fontSize: "24px", marginBottom: "10px" }}>Bied op {domainData.domain}</h1>
+      <p style={{ fontSize: "16px", marginBottom: "20px", color: "#555" }}>{domainData.description}</p>
+      
+      {/* Vraagprijs boven het formulier */}
+      <p style={{ fontSize: "18px", fontWeight: "bold", color: "#333", marginBottom: "20px" }}>
+        Vraagprijs: €{domainData.price} ex. BTW
+      </p>
 
-        <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY} onChange={handleCaptchaChange} />
-        <button type="submit" disabled={loading}>{loading ? "Verzenden..." : "Verstuur bod"}</button>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        <input 
+          type="text" 
+          name="name" 
+          placeholder="Naam" 
+          value={formData.name} 
+          onChange={handleChange} 
+          required 
+          style={{ padding: "10px", fontSize: "16px", border: "1px solid #ccc", borderRadius: "4px" }} 
+        />
+        <input 
+          type="email" 
+          name="email" 
+          placeholder="Emailadres" 
+          value={formData.email} 
+          onChange={handleChange} 
+          required 
+          style={{ padding: "10px", fontSize: "16px", border: "1px solid #ccc", borderRadius: "4px" }} 
+        />
+        <input 
+          type="tel" 
+          name="phone" 
+          placeholder="Telefoonnummer" 
+          value={formData.phone} 
+          onChange={handleChange} 
+          required 
+          style={{ padding: "10px", fontSize: "16px", border: "1px solid #ccc", borderRadius: "4px" }} 
+        />
+        <input 
+          type="number" 
+          name="offer" 
+          placeholder="Bod in euro's" 
+          value={formData.offer} 
+          onChange={handleChange} 
+          required 
+          style={{ padding: "10px", fontSize: "16px", border: "1px solid #ccc", borderRadius: "4px" }} 
+        />
+        <textarea 
+          name="message" 
+          placeholder="Optioneel bericht" 
+          value={formData.message} 
+          onChange={handleChange} 
+          style={{ padding: "10px", fontSize: "16px", border: "1px solid #ccc", borderRadius: "4px", minHeight: "100px" }} 
+        />
+
+        <ReCAPTCHA 
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY} 
+          onChange={handleCaptchaChange} 
+        />
+        
+        <button 
+          type="submit" 
+          disabled={loading} 
+          style={{
+            padding: "15px", 
+            fontSize: "18px", 
+            backgroundColor: "#4CAF50", 
+            color: "#fff", 
+            border: "none", 
+            borderRadius: "4px", 
+            cursor: "pointer", 
+            transition: "background-color 0.3s"
+          }}
+        >
+          {loading ? "Verzenden..." : "Verstuur bod"}
+        </button>
       </form>
 
-      <Link href="/" prefetch={false} style={{ display: "block", marginTop: "20px", textAlign: "center" }}>
+      {/* USP's onder het formulier */}
+      <div style={{ marginTop: "30px", fontSize: "16px", color: "#333", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <span style={{ color: "#4CAF50", marginRight: "8px" }}>✔</span>
+          <span>Doe een vrijblijvend bod op jouw nieuwe domeinnaam</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <span style={{ color: "#4CAF50", marginRight: "8px" }}>✔</span>
+          <span>Ontvang binnen 24 uur een reactie</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <span style={{ color: "#4CAF50", marginRight: "8px" }}>✔</span>
+          <span>Betrouwbare ondersteuning bij de aankoop</span>
+        </div>
+      </div>
+
+      <Link href="/" prefetch={false} style={{ display: "block", marginTop: "20px", textAlign: "center", textDecoration: "underline", color: "#333" }}>
         Terug naar home
       </Link>
     </div>
   );
 }
 
-// **Optimaliseer getStaticPaths()**
+// **Dynamic Path Generation**
 export async function getStaticPaths() {
   const filePath = path.join(process.cwd(), "data", "domeinen.json");
   const jsonData = fs.readFileSync(filePath, "utf8");
   const allDomains = JSON.parse(jsonData);
 
-  // Beperk het aantal statisch gegenereerde pagina’s om buildtijd te verkorten
-  const paths = allDomains.slice(0, 50).map((domain) => ({
-    params: { domain: domain.toLowerCase() },
+  const paths = allDomains.map((domain) => ({
+    params: { domain: domain.domain.toLowerCase() },
   }));
 
   return { paths, fallback: "blocking" };
 }
 
-// **Optimaliseer getStaticProps()**
+// **Static Props with JSON**
 export async function getStaticProps({ params }) {
-  const { domain } = params;
-
-  if (!domain) {
-    return { notFound: true };
-  }
-
   const filePath = path.join(process.cwd(), "data", "domeinen.json");
   const jsonData = fs.readFileSync(filePath, "utf8");
   const allDomains = JSON.parse(jsonData);
 
-  const originalDomain = allDomains.find((d) => d.toLowerCase() === domain.toLowerCase());
+  const domainData = allDomains.find(
+    (d) => d.domain.toLowerCase() === params.domain.toLowerCase()
+  );
 
-  if (!originalDomain) {
+  if (!domainData) {
     return { notFound: true };
   }
 
   return {
-    props: { domain: originalDomain },
-    revalidate: 18000, // Revalidate de pagina elke 18000 seconden
+    props: { domainData },
+    revalidate: 18000,
   };
 }

@@ -10,8 +10,8 @@ export default function HomePage({ domains }) {
       <ul>
         {domains.map((domain, index) => (
           <li key={index}>
-            <Link href={`/domeinen/${domain.toLowerCase()}`} prefetch={false}>
-              {domain}
+            <Link href={`/domeinen/${domain.domain.toLowerCase()}`} prefetch={false}>
+              {domain.domain}
             </Link>
           </li>
         ))}
@@ -31,6 +31,6 @@ export async function getStaticProps() {
     props: {
       domains: allDomains,
     },
-    revalidate: 60, // Pagina wordt elke 60 seconden opnieuw opgebouwd, pas aan op basis van je behoefte
+    revalidate: 18000, // Pagina wordt elke 18000 seconden opnieuw opgebouwd, pas aan op basis van je behoefte
   };
 }

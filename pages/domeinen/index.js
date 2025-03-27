@@ -7,10 +7,10 @@ export default function DomainsList({ domains }) {
     <div style={{ padding: "20px", maxWidth: "900px", margin: "auto" }}>
       <h1>Beschikbare Domeinen</h1>
       <ul>
-        {domains.map((domain, index) => (
+        {domains.map((domainObj, index) => (
           <li key={index}>
-            <Link href={`/domeinen/${domain.toLowerCase()}`} prefetch={false}>
-              {domain}
+            <Link href={`/domeinen/${domainObj.domain.toLowerCase()}`} prefetch={false}>
+              {domainObj.domain}
             </Link>
           </li>
         ))}
@@ -28,7 +28,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      domains: allDomains, // Geef de lijst van domeinen door als props
+      domains: allDomains, // Correcte verwijzing naar de JSON-objecten
     },
     revalidate: 18000, // Revalidate de pagina elke 18000 seconden
   };
