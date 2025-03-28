@@ -22,12 +22,16 @@ export default function DomainsPage({ domains }) {
 }
 
 export async function getStaticProps() {
+  // Pad naar het bestand met domeinen
   const filePath = path.join(process.cwd(), "data", "domains_data.json");
 
-  // Gebruik fs.promises.readFile voor asynchrone bestandstoegang
+  // Leest het JSON-bestand op een asynchrone manier
   const jsonData = await fs.promises.readFile(filePath, "utf8");
+
+  // Parse de JSON-data en stel deze in als een array
   const domains = JSON.parse(jsonData);
 
+  // Return de domeinen als props
   return {
     props: {
       domains,
