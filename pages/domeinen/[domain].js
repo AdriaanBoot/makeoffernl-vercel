@@ -15,6 +15,7 @@ export default function DomainPage({ domainData }) {
 
   const [captchaValue, setCaptchaValue] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [thankYouMessage, setThankYouMessage] = useState(false); // State voor de bedanktmelding
 
   const handleChange = useCallback((e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -42,7 +43,7 @@ export default function DomainPage({ domainData }) {
       });
 
       if (response.ok) {
-        alert("Bod succesvol verzonden!");
+        setThankYouMessage(true); // Toon de bedanktmelding
         setFormData({ name: "", email: "", phone: "", offer: "", message: "" });
         setCaptchaValue(null);
       } else {
@@ -152,6 +153,22 @@ export default function DomainPage({ domainData }) {
           <span>Betrouwbare ondersteuning bij de aankoop</span>
         </div>
       </div>
+
+      {/* Bedanktmelding in grijs en onder de verzendknop */}
+      {thankYouMessage && (
+        <div style={{
+          padding: "15px",
+          backgroundColor: "#E0E0E0", // Grijze kleur
+          color: "#333", // Donkere tekstkleur
+          borderRadius: "4px",
+          marginTop: "20px",
+          textAlign: "center",
+          fontSize: "16px",
+          fontWeight: "bold"
+        }}>
+          Bedankt voor je bod! We nemen zo snel mogelijk contact met je op.
+        </div>
+      )}
 
       <Link href="/" prefetch={false} style={{ display: "block", marginTop: "20px", textAlign: "center", textDecoration: "underline", color: "#333" }}>
         Terug naar home
