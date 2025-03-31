@@ -4,76 +4,87 @@
       "language": "en",
       "price": "2500",
       "min_offer": "1500",
-      "description": "BoxHire - Your ultimate storage solution. Make a good offer, and it might be yours!"
+      "description": "BoxHire - Your ultimate storage solution. Make a good offer, and it might be yours!",
+      "featured": true
     },
     {
       "domain": "Airloungers.com",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "AirLoungers - Comfortable air chairs for your garden. Make a good offer and this domain could be yours soon!"
+      "description": "AirLoungers - Comfortable air chairs for your garden. Make a good offer and this domain could be yours soon!",
+      "featured": true
     },
     {
       "domain": "Brandliftstudy.com",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "BrandliftStudy - Great offers for new business ideas. Make an offer, and it could soon be yours!"
+      "description": "BrandliftStudy - Great offers for new business ideas. Make an offer, and it could soon be yours!",
+      "featured": true
     },
     {
       "domain": "Buyrefill.com",
       "language": "en",
       "price": "2500",
       "min_offer": "1500",
-      "description": "BuyRefill - A domain for a modern and sustainable business idea. Make a great offer, and it could be yours!"
+      "description": "BuyRefill - A domain for a modern and sustainable business idea. Make a great offer, and it could be yours!",
+      "featured": true
     },
     {
       "domain": "Fastingatnight.com",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "FastingAtNight - A perfect domain for a health-related business. Make an offer and it might be yours!"
+      "description": "FastingAtNight - A perfect domain for a health-related business. Make an offer and it might be yours!",
+      "featured": true
     },
     {
       "domain": "Geschenkexperte.de",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "GeschenkExperte - The perfect domain for a gift-related business. Make a good offer and this domain could soon be yours!"
+      "description": "GeschenkExperte - The perfect domain for a gift-related business. Make a good offer and this domain could soon be yours!",
+      "featured": false
     },
     {
       "domain": "Lilhut.com",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "LilHut - A great domain for a lifestyle or home goods brand. Make an offer, and it could be yours!"
+      "description": "LilHut - A great domain for a lifestyle or home goods brand. Make an offer, and it could be yours!",
+      "featured": true
     },
     {
       "domain": "Mypicks.co.uk",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "MyPicks - A perfect domain for a recommendation platform or review site. Make a good offer and it could be yours!"
+      "description": "MyPicks - A perfect domain for a recommendation platform or review site. Make a good offer and it could be yours!",
+      "featured": true
     },
     {
       "domain": "Vesdre.com",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "Vesdre - A versatile domain with potential for a variety of industries. Make a good offer and it might be yours!"
+      "description": "Vesdre - A versatile domain with potential for a variety of industries. Make a good offer and it might be yours!",
+      "featured": true
     },
     {
       "domain": "Watkinsons.com",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "Watkinsons - A brandable domain perfect for a business. Make an offer, and this domain could soon be yours!"
+      "description": "Watkinsons - A brandable domain perfect for a business. Make an offer, and this domain could soon be yours!",
+      "featured": true
     },
     {
       "domain": "Pinterestseo.com",
       "language": "en",
       "price": "500",
       "min_offer": "250",
-      "description": "PinterestSEO - A great domain for an SEO or social media business. Make a good offer and it might be yours!"
+      "description": "PinterestSEO - A great domain for an SEO or social media business. Make a good offer and it might be yours!",
+      "featured": true
     }
 ]
